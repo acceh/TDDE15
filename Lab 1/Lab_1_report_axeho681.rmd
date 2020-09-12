@@ -46,7 +46,7 @@ plot(bn_hc)
 
 ```
 
-Above is the junction tree for the data with 5 restarts and an initinital graph based on empty.graph(c("A", "S", "T", "L", "B", "E", "X", "D")).
+Above is the junction tree for the data with 5 restarts.
 
 ```{r Task 1_2, echo=FALSE}
 
@@ -65,7 +65,7 @@ print(all.equal(bn_hc, bn_hc_2))
 
 ```
 
-As one can see in the print statement above, as well as in the plots, the hill-climbing algorithm  can return non-equivalent BN-strucvtures. The reason for this is that .... 
+As one can see in the print statement above, as well as in the plots, the hill-climbing algorithm  can return non-equivalent BN-structures. The reason for this is mainly the score evaluation method as that changes how the hill-climbing method is made. In addtion, the restarts indicates how many times the algorithm restarts, which also contributes to how the BN ends up at the end of the algorithm.
 
 
 ## Task 2
@@ -142,3 +142,97 @@ confusion_matrix_true
 ```
 
 Above is the confusion matrix based on BN from the true Asia BN.
+
+Both of the confusion matrices are the same, which can be attributed to that both of the networks has the same connections to node "S", so "S" is evaluated the same in both of the networks.
+
+
+## Task 3
+
+*In the previous exercise, you classified the variable S given observations for all the rest of the variables. Now, you are asked to classify S given observations only for the so-called Markov blanket of S, i.e. its parents plus its children plus the parents of its children minus S itself. Report again the confusion matrix.*
+
+```{r Task 3_1, echo=FALSE}
+bn_pred_mb <-
+  prediction(j_tree, test, mb(bn_fit, "S"), c("S"))
+bn_pred_mb_true <-
+  prediction(j_tree_true, test, mb(bn_true_fit, "S"), c("S"))
+
+confusion_matrix_fit_mb <- table(bn_pred_mb, test$S)
+confusion_matrix_fit_mb
+```
+
+Above is the confusion matrix when S is classified only for the Markov Blanket of S.
+
+```{r Task 3_2, echo=FALSE}
+confusion_matrix_true_mb <- table(bn_pred_mb_true, test$S)
+confusion_matrix_true_mb
+```
+
+Above is the confusion matrix when S is classified only for the Markov Blanket of S for the true Asia BN.
+
+
+## Task 4
+
+*Repeat the exercise (2) using a naive Bayes classifier, i.e. the predictive variables are independent given the class variable. See p. 380 in Bishop’s book or Wikipedia for more information on the naive Bayes classifier. Model the naive Bayes classifier as a BN. You have to create the BN by hand, i.e. you are not allowed to use the function naive.bayes from the bnlearn package.*
+
+```{r Task 4_1, echo=FALSE}
+bn_naive <- empty.graph(c("A", "S", "T", "L", "B", "E", "X", "D"))
+arc.set <- matrix(
+  c("S", "A",
+    "S", "T",
+    "S", "L",
+    "S", "B",
+    "S", "E",
+    "S", "X",
+    "S", "D"),
+  ncol = 2,
+  byrow = TRUE,
+  dimnames = list(NULL, c("from", "to"))
+)
+# Above is the BN set. In a naive bayes network all nodes are dependent on the independent classifier
+# node. If S is observed, all other nodes are independent
+
+arcs(bn_naive) <- arc.set
+
+bn_naive_fit <- bn.fit(bn_naive, data=train)
+
+bn_naive_grain <- as.grain(bn_naive_fit)
+
+bn_naive_comp <- compile(bn_naive_grain)
+
+bn_naive_pred <- prediction(bn_naive_comp, test, c("A", "T", "L", "B", "E", "X", "D"), c("S"))
+
+confusion_matrix_fit_naive <- table(bn_naive_pred, test$S)
+confusion_matrix_fit_naive
+```
+
+
+## Task 5
+
+The reason for the confusion matrices being the same in task 2 and task 3 is because the dependence of "S" is the same in both cases, which is "L" and "B". 
+
+The confusion matrix is different in task 4 as that has a completely different dependency where all the nodes are dependent on "S" instead. This even though they may not have any dependence at all in the real world. This leads to an overfitting of the data compared to the previous cases where in depended on only "L" and "B".
+
+
+\newpage
+
+# Appendix for code
+
+```{r, code=readLines("Lab_1.R"), echo=TRUE, eval=FALSE}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
