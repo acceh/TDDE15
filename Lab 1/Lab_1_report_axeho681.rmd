@@ -8,9 +8,8 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r Sety up, include=FALSE}
+```{r Set up, include=FALSE}
 #SET UP
-
 library(bnlearn)
 library(Rgraphviz)
 if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -23,9 +22,6 @@ data("asia")
 data <- asia
 
 ```
-
-
-
 
 ## Task 1
 
@@ -65,7 +61,7 @@ print(all.equal(bn_hc, bn_hc_2))
 
 ```
 
-As one can see in the print statement above, as well as in the plots, the hill-climbing algorithm  can return non-equivalent BN-structures. The reason for this is mainly the score evaluation method as that changes how the hill-climbing method is made. In addtion, the restarts indicates how many times the algorithm restarts, which also contributes to how the BN ends up at the end of the algorithm.
+As one can see in the print statement above, as well as in the plots, the hill-climbing algorithm  can return non-equivalent BN-structures. The reason for this is mainly the score evaluation method as that changes how the hill-climbing method is made. In addtion, the restarts indicates how many times the algorithm restarts and thereby can move away from potential "bad" local optimums, which also contributes to how the BN ends up at the end of the algorithm.
 
 
 ## Task 2
@@ -208,9 +204,11 @@ confusion_matrix_fit_naive
 
 ## Task 5
 
-The reason for the confusion matrices being the same in task 2 and task 3 is because the dependence of "S" is the same in both cases, which is "L" and "B". 
+*Explain why you obtain the same or different results in the exercises (2-4).*
 
-The confusion matrix is different in task 4 as that has a completely different dependency where all the nodes are dependent on "S" instead. This even though they may not have any dependence at all in the real world. This leads to an overfitting of the data compared to the previous cases where in depended on only "L" and "B".
+The reason for the confusion matrices being the same in task 2 and task 3 is because the dependence of "S" is the same in both cases, which is "L" and "B" (which is the Markow blanket for S). With knowledge about the state of L and B we have full information and therefore the result is the same when doing prediction for the whole network and for the Markow blanket. This applies as we complete data.
+
+The confusion matrix is different in task 4 because of completely different dependency where all the nodes are dependent on "S" instead. Considering Bayes Theorem this affects the construction of the posterior distribution of S. We know the true structure of the BN and that the posterior should only consist of the distributions of L, B and the prior of S. We can then understand that the predictions are different.
 
 
 \newpage

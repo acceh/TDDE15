@@ -29,14 +29,10 @@ set.seed(12345)
 bn_hc_2 <- hc(x = data,
               score = "aic")
 bn_hc_2 <- cpdag(bn_hc_2)
-bn_hc <- cpdag(bn_hc_2)
-
 plot(bn_hc_2)
 
 # Check equality
 print(all.equal(bn_hc, bn_hc_2))
-
-
 
 ##### TASK 2 #####
 # Learn a BN from 80% of the data set. Use BN to classify the rest of the data.
