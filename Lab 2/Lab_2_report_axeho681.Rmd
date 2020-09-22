@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Task 1
 
+*Build a hidden Markov model (HMM) for the scenario described above.*
+
 ```{r task_1, echo=FALSE}
 library(HMM)
 
@@ -71,6 +73,8 @@ summary(hmm)
 
 ## Task 2
 
+*Simulate the HMM for 100 time steps.*
+
 ```{r task_2, echo=FALSE}
 set.seed(12345)
 simulated_steps <- simHMM(hmm,100)
@@ -79,6 +83,8 @@ simulated_steps$observation
 ```
 
 ## Task 3
+
+*Discard the hidden states from the sample obtained above. Use the remaining observations to compute the filtered and smoothed probability distributions for each of the 100 time points. Compute also the most probable path.*
 
 ```{r task_3, echo=FALSE}
 
@@ -140,6 +146,8 @@ viterbi
 
 ## Task 4
 
+*Compute the accuracy of the filtered and smoothed probability distributions, and of the most probable path. That is, compute the percentage of the true hidden states that are guessed by each method.*
+
 ```{r task_4_1, echo=FALSE}
 accuracy_function <- function(prediction, true) {
   confusion_matrix <- table(prediction, true)
@@ -150,11 +158,21 @@ accuracy_function <- function(prediction, true) {
 filtered_prediction <- apply(t(filtered), MARGIN = 1, which.max)
 smoothed_prediction <- apply(t(smoothed), MARGIN = 1, which.max)
 
-
+print("Filtered:")
 accuracy_function(filtered_prediction, simulated_steps$states)
+print("Smoothed:")
 accuracy_function(smoothed_prediction, simulated_steps$states)
+print("Most probable path:")
 accuracy_function(viterbi, simulated_steps$states)
+```
 
+
+
+## Task 5
+
+*Repeat the previous exercise with different simulated samples. In general, the smoothed distributions should be more accurate than the filtered distributions. Why? In general, the smoothed distributions should be more accurate than the most probable paths, too. Why?*
+
+```{r task_5, echo=FALSE}
 
 ##### TASK 5 #####
 #Different seed
@@ -189,14 +207,72 @@ accuracy_function(smoothed_prediction_seeded, simulated_steps_seeded$states)
 accuracy_function(viterbi_seeded, simulated_steps_seeded$states)
 ```
 
+The smoothed distribution is more accurate as it takes both $\alpha$ and $\beta$ from the forward and the backward part of the algorithm with the formula $p(z^t|x^{0:t})=(\alpha(z^t)\beta(z^t))/(\sum_zt\alpha(z^t)\beta(z^t))$ compared to the filtering which only takes $\alpha$ in to account $p(z^t|x^{0:t})=\alpha(z^t)/\sum_zt\alpha(z^t)$.
+
+## Task 6
+
+*Is it true that the more observations you have the better you know where the robot is?*
+
+```{r task_6, echo=FALSE}
+library(entropy)
 
 
-## Task 5
+simulated_steps_300 <- simHMM(hmm, 300)
 
+hmm_forward_alpha_300 <-
+  exp(forward(hmm = hmm,
+              observation = simulated_steps_300$observation))
 
-```{r task_5, echo=FALSEF}
+hmm_backward_beta_300 <-
+  exp(backward(hmm = hmm,
+               observation = simulated_steps_300$observation))
+
+filtered_300 <- filter_function(hmm_forward_alpha)
+
+smoothed_300 <-
+  smooth_function(hmm_forward_alpha, hmm_backward_beta)
+
+viterbi_300 <- viterbi(hmm, simulated_steps_300$observation)
+
+filtered_prediction_300 <- apply(t(filtered), MARGIN = 1, which.max)
+
+entropy_100 <- entropy.empirical(filtered_prediction)
+entropy_300 <- entropy.empirical(filtered_prediction_300)
 
 ```
 
+The entropy for the case with 100 simluated cases is:
 
+```{r task_6_2, echo=FALSE}
+entropy_100
+```
 
+The entropy for the case with 300 simluated cases is:
+
+```{r task_6_3, echo=FALSE}
+entropy_300
+```
+
+## Task 7
+
+*Consider any of the samples above of length 100. Compute the probabilities of the hidden states for the time step 101.*
+
+```{r task_7, echo=FALSE}
+
+step_101 <- transition_probs %*% t(filtered)[100, ]
+```
+
+The 101st step would be:
+
+```{r task_7_2, echo=FALSE}
+
+step_101
+```
+
+\newpage
+
+## Appendix for code
+
+```{r, code=readLines("Lab_2.R"), echo=TRUE, eval=FALSE}
+
+```
