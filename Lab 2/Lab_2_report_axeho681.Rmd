@@ -1,3 +1,17 @@
+---
+title: "Lab 2"
+author: "Axel Holmberg (axeho681)"
+date: "9/22/2020"
+output: pdf_document
+---
+
+```{r Set up, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+
+```{r task_1, echo=FALSE}
 library(HMM)
 
 ##### TASK 1 #####
@@ -43,13 +57,30 @@ hmm <-
           transProbs = transition_probs,
           emissionProbs = emission_probs
           )
+print("States:")
+states
+print("Symbol states:")
+symbol_states
+print("Transition matrix:")
+transition_probs
+print("Emission matrix:")
+emission_probs
+print("Summary of HMM:")
+summary(hmm)
+```
 
+## Task 2
 
-
-##### TASK 2 #####
-
+```{r task_2, echo=FALSE}
 set.seed(12345)
 simulated_steps <- simHMM(hmm,100)
+print("The observed simulated steps are:")
+simulated_steps$observation
+```
+
+## Task 3
+
+```{r task_3, echo=FALSE}
 
 ##### TASK 3 #####
 
@@ -98,9 +129,18 @@ smoothed <-
 
 viterbi <- viterbi(hmm, simulated_steps$observation)
 
+```
 
-##### TASK 4 #####
+The most probable path is:
 
+```{r task_3_2, echo=FALSE}
+viterbi
+```
+
+
+## Task 4
+
+```{r task_4_1, echo=FALSE}
 accuracy_function <- function(prediction, true) {
   confusion_matrix <- table(prediction, true)
   accuracy <- sum(diag(confusion_matrix))/sum(confusion_matrix)
@@ -147,40 +187,16 @@ smoothed_prediction_seeded <- apply(t(smoothed_seeded), MARGIN = 1, which.max)
 accuracy_function(filtered_prediction_seeded, simulated_steps_seeded$states)
 accuracy_function(smoothed_prediction_seeded, simulated_steps_seeded$states)
 accuracy_function(viterbi_seeded, simulated_steps_seeded$states)
+```
 
 
-##### TASK 6 #####
-library(entropy)
+
+## Task 5
 
 
-simulated_steps_300 <- simHMM(hmm, 300)
+```{r task_5, echo=FALSEF}
 
-hmm_forward_alpha_300 <-
-  exp(forward(hmm = hmm,
-              observation = simulated_steps_300$observation))
-
-hmm_backward_beta_300 <-
-  exp(backward(hmm = hmm,
-               observation = simulated_steps_300$observation))
-
-filtered_300 <- filter_function(hmm_forward_alpha)
-
-smoothed_300 <-
-  smooth_function(hmm_forward_alpha, hmm_backward_beta)
-
-viterbi_300 <- viterbi(hmm, simulated_steps_300$observation)
-
-filtered_prediction_300 <- apply(t(filtered), MARGIN = 1, which.max)
-
-entropy_100 <- entropy.empirical(filtered_prediction)
-entropy_300 <- entropy.empirical(filtered_prediction_300)
-
-entropy_100
-entropy_300
+```
 
 
-##### TASK 7 #####
 
-step_101 <- transition_probs %*% t(filtered)[100, ]
-
-print(step_101)
