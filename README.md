@@ -7,5 +7,8 @@ This repo is for the course TDDE15 (Advanced Machine Learning) done during the a
 
 - Bayesian Networks
 
+### Lab 3
+
+- Hidden markov networks
 
 <em>This repo is a work in progress...</em>
