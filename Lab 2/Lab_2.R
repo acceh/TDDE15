@@ -53,85 +53,11 @@ hmm <-
 set.seed(12345)
 simulated_steps <- simHMM(hmm,100)
 
-simulated_steps$states <- c()
+simulated_steps
 
 ##### TASK 3 #####
 
 
-#Function for alphas for the forward part of the backward forward algorithm
-create_alpha <- function(poss_states, hmm, obs, alpha_prev) {
-  alpha <- NULL
-  
-  for (state in poss_states) {
-    emission <- hmm$emissionProbs[state, obs]
-    
-    
-    weighted_transition <- sum(sapply(poss_states, function(z) {
-      alpha_prev[z] * hmm$transProbs[z, state]
-    }))
-    
-    alpha[state] <- emission * weighted_transition
-  }
-  return (alpha)
-}
-
-create_beta <- function(poss_states, hmm, obs_next, beta_next) {
-  beta <- NULL
-  
-  
-  for (state in poss_states) {
-    beta[state] <- sum(sapply(poss_states, function(z) {
-      beta_next[z] * hmm$emissionProbs[z, obs_next] * hmm$transProbs[state, z]
-    }))
-  }
-  return (beta)
-}
-
-
-
-forward_backward_function <-
-  function(poss_states,
-           hmm,
-           obs_vars) {
-    #Gets the length of the list with observed vars from the simulated hmm steps.
-    T <- length(obs_vars)
-    # Initalize alpha and beta for the algorithm
-    alpha <- matrix(NA, nrow = T, ncol = length(poss_states))
-    beta <- matrix(NA, nrow = T, ncol = length(poss_states))
-    
-    
-    first_obs <- obs_vars[1]
-    initial <- hmm$startProbs
-    alpha[1,] <- hmm$emissionProbs[, first_obs] * initial
-    
-    #Forward
-    for (t in 2:T) {
-      # Getting alpha for time t
-      alpha[t,] <- create_alpha(
-        poss_states = poss_states,
-        hmm = hmm,
-        obs = obs_vars[t],
-        alpha_prev = alpha[t - 1,]
-      )
-    }
-    
-    
-    beta[T,] <- 1
-    
-    #Backward
-    for (t in (T - 1):1) {
-      # Getting beta for time step t
-      beta[t,] <- create_beta(
-        poss_states = poss_states,
-        hmm = hmm,
-        obs = obs_vars[t + 1],
-        beta_next = beta[t + 1,]
-      )
-    }
-    return (list(alpha = alpha, beta = beta))
-    
-    
-  }
 
 
 filter_function <- function(alphas) {
@@ -162,18 +88,36 @@ smooth_function <- function(alphas, betas) {
 }
 
 
-hmm_forward_backward <-
-  forward_backward_function(
-    poss_states = 1:10,
+hmm_forward_alpha <-
+  exp(forward(
     hmm = hmm,
-    obs_vars = simulated_steps$observation
-  )
+    observation = simulated_steps$observation
+  ))
 
-filtered <- filter_function(hmm_forward_backward$alpha)
+hmm_forward_beta <-
+ exp( backward(
+    hmm = hmm,
+    observation = simulated_steps$observation
+  ))
+
+filtered <- filter_function(hmm_forward_alpha)
 
 smoothed <-
-  smooth_function(hmm_forward_backward$alpha, hmm_forward_backward$beta)
+  smooth_function(hmm_forward_alpha, hmm_forward_beta)
+
+viterbi <- viterbi(hmm, simulated_steps$observation)
 
 
+##### TASK 4 #####
+
+accuracy_function <- function(prediction, true) {
+  confusion_matrix <- table(prediction, true)
+  accuracy <- sum(diag(confusion_matrix))/sum(confusion_matrix)
+  return (accuracy)
+}
+
+filtered_prediction <- apply(t(filtered), MARGIN = 1, which.max)
+smoothed_prediction <- apply(smoothed, MARGIN = 1, which.max)
 
 
+accuracy_function(filtered_prediction)
