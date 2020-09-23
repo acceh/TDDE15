@@ -7,7 +7,7 @@ states <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 symbol_states <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 # Equal probability of it moving and staying
-transition_probs <- matrix(
+transition_probs <- t(matrix(
                    c(0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 0,
@@ -18,7 +18,7 @@ transition_probs <- matrix(
                      0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5,
                      0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0.5), 
-                     nrow=10, ncol=10)
+                     nrow=10, ncol=10))
 
 
 # Equal probability of it being i-2,i-1,i,i+1 and i+2
@@ -49,7 +49,7 @@ hmm <-
 ##### TASK 2 #####
 
 set.seed(12345)
-simulated_steps <- simHMM(hmm,100)
+simulated_steps <- simHMM(hmm, 100)
 
 ##### TASK 3 #####
 
@@ -57,8 +57,9 @@ filter_function <- function(alphas) {
   filtered <- matrix(NA,
                      nrow = dim(alphas)[1],
                      ncol = dim(alphas)[2])
-  for (t in 1:dim(alphas)[1]) {
-    filtered[t,] <- alphas[t,] / sum(alphas[t,])
+  
+  for (t in 1:dim(alphas)[2]) {
+    filtered[,t] <- alphas[, t] / sum(alphas[, t])
   }
   
   return(filtered)
@@ -70,9 +71,9 @@ smooth_function <- function(alphas, betas) {
                      nrow = dim(alphas)[1],
                      ncol = dim(alphas)[2])
   
-  for (t in 1:dim(alphas)[1]) {
-    smoothed[t, ] <-
-      (alphas[t, ] * betas[t, ]) / (sum(alphas[t, ] * betas[t, ]))
+  for (t in 1:dim(alphas)[2]) {
+    smoothed[, t] <-
+      (alphas[, t] * betas[, t]) / (sum(alphas[, t] * betas[, t]))
   }
   
   return (smoothed)
@@ -80,16 +81,12 @@ smooth_function <- function(alphas, betas) {
 
 
 hmm_forward_alpha <-
-  exp(forward(
-    hmm = hmm,
-    observation = simulated_steps$observation
-  ))
+  exp(forward(hmm = hmm,
+              observation = simulated_steps$observation))
 
 hmm_backward_beta <-
- exp( backward(
-    hmm = hmm,
-    observation = simulated_steps$observation
-  ))
+  exp(backward(hmm = hmm,
+               observation = simulated_steps$observation))
 
 filtered <- filter_function(hmm_forward_alpha)
 
@@ -184,3 +181,4 @@ entropy_300
 step_101 <- transition_probs %*% t(filtered)[100, ]
 
 print(step_101)
+

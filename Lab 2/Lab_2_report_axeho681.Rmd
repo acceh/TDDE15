@@ -23,7 +23,7 @@ states <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 symbol_states <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 # Equal probability of it moving and staying
-transition_probs <- matrix(
+transition_probs <- t(matrix(
                    c(0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 0,
@@ -34,7 +34,7 @@ transition_probs <- matrix(
                      0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5,
                      0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0.5), 
-                     nrow=10, ncol=10)
+                     nrow=10, ncol=10))
 
 
 # Equal probability of it being i-2,i-1,i,i+1 and i+2
@@ -94,8 +94,9 @@ filter_function <- function(alphas) {
   filtered <- matrix(NA,
                      nrow = dim(alphas)[1],
                      ncol = dim(alphas)[2])
-  for (t in 1:dim(alphas)[1]) {
-    filtered[t,] <- alphas[t,] / sum(alphas[t,])
+  
+  for (t in 1:dim(alphas)[2]) {
+    filtered[, t] <- alphas[, t] / sum(alphas[, t])
   }
   
   return(filtered)
@@ -107,9 +108,9 @@ smooth_function <- function(alphas, betas) {
                      nrow = dim(alphas)[1],
                      ncol = dim(alphas)[2])
   
-  for (t in 1:dim(alphas)[1]) {
-    smoothed[t, ] <-
-      (alphas[t, ] * betas[t, ]) / (sum(alphas[t, ] * betas[t, ]))
+  for (t in 1:dim(alphas)[2]) {
+    smoothed[, t] <-
+      (alphas[, t] * betas[, t]) / (sum(alphas[, t] * betas[, t]))
   }
   
   return (smoothed)
@@ -117,16 +118,12 @@ smooth_function <- function(alphas, betas) {
 
 
 hmm_forward_alpha <-
-  exp(forward(
-    hmm = hmm,
-    observation = simulated_steps$observation
-  ))
+  exp(forward(hmm = hmm,
+              observation = simulated_steps$observation))
 
 hmm_backward_beta <-
- exp( backward(
-    hmm = hmm,
-    observation = simulated_steps$observation
-  ))
+  exp(backward(hmm = hmm,
+               observation = simulated_steps$observation))
 
 filtered <- filter_function(hmm_forward_alpha)
 
@@ -196,7 +193,7 @@ filtered_seeded <- filter_function(hmm_forward_alpha_seeded)
 smoothed_seeded <-
   smooth_function(hmm_forward_alpha_seeded, hmm_backward_beta_seeded)
 
-viterbi_seeded <- viterbi(hmm, simulated_steps$observation)
+viterbi_seeded <- viterbi(hmm, simulated_steps_seeded$observation)
 
 filtered_prediction_seeded <- apply(t(filtered_seeded), MARGIN = 1, which.max)
 smoothed_prediction_seeded <- apply(t(smoothed_seeded), MARGIN = 1, which.max)
@@ -207,7 +204,7 @@ accuracy_function(smoothed_prediction_seeded, simulated_steps_seeded$states)
 accuracy_function(viterbi_seeded, simulated_steps_seeded$states)
 ```
 
-The smoothed distribution is more accurate as it takes both $\alpha$ and $\beta$ from the forward and the backward part of the algorithm with the formula $p(z^t|x^{0:t})=(\alpha(z^t)\beta(z^t))/(\sum_zt\alpha(z^t)\beta(z^t))$ compared to the filtering which only takes $\alpha$ in to account $p(z^t|x^{0:t})=\alpha(z^t)/\sum_zt\alpha(z^t)$.
+The smoothed distribution is more accurate as it takes both $\alpha$ and $\beta$ from the forward and the backward part of the algorithm with the formula $p(z^t|x^{0:T})=(\alpha(z^t)\beta(z^t))/(\sum_zt\alpha(z^t)\beta(z^t))$ compared to the filtering which only takes $\alpha$ in to account $p(z^t|x^{0:t})=\alpha(z^t)/\sum_zt\alpha(z^t)$.
 
 ## Task 6
 
@@ -258,7 +255,6 @@ entropy_300
 *Consider any of the samples above of length 100. Compute the probabilities of the hidden states for the time step 101.*
 
 ```{r task_7, echo=FALSE}
-
 step_101 <- transition_probs %*% t(filtered)[100, ]
 ```
 
