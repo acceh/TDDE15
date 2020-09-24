@@ -134,9 +134,22 @@ viterbi <- viterbi(hmm, simulated_steps$observation)
 
 ```
 
-The most probable path is:
+
+The most filtered distribution is (only first few steps):
 
 ```{r task_3_2, echo=FALSE}
+filtered[,1:5]
+```
+
+The most smoothed distribution is (only first few steps):
+
+```{r task_3_3, echo=FALSE}
+smoothed[,1:5]
+```
+
+The most probable path is:
+
+```{r task_3_4, echo=FALSE}
 viterbi
 ```
 
@@ -224,31 +237,53 @@ hmm_backward_beta_300 <-
   exp(backward(hmm = hmm,
                observation = simulated_steps_300$observation))
 
-filtered_300 <- filter_function(hmm_forward_alpha)
+filtered_300 <- filter_function(hmm_forward_alpha_300)
 
 smoothed_300 <-
-  smooth_function(hmm_forward_alpha, hmm_backward_beta)
+  smooth_function(hmm_forward_alpha_300, hmm_backward_beta_300)
 
 viterbi_300 <- viterbi(hmm, simulated_steps_300$observation)
 
-filtered_prediction_300 <- apply(t(filtered), MARGIN = 1, which.max)
+smoothed_prediction_300 <- apply(t(smoothed_300), MARGIN = 1, which.max)
+filtered_prediction_300 <- apply(t(filtered_300), MARGIN = 1, which.max)
 
-entropy_100 <- entropy.empirical(filtered_prediction)
-entropy_300 <- entropy.empirical(filtered_prediction_300)
+entropy_filtered_100 <- entropy.empirical(filtered_prediction)
+entropy_filtered_300 <- entropy.empirical(filtered_prediction_300)
+entropy_smoothed_100 <- entropy.empirical(smoothed_prediction)
+entropy_smoothed_300 <- entropy.empirical(smoothed_prediction_300)
+
+
+
 
 ```
 
-The entropy for the case with 100 simluated cases is:
 
 ```{r task_6_2, echo=FALSE}
-entropy_100
-```
+print("Entropy for 100 simulated samples for filtered distribution:")
+entropy_filtered_100
+print("Entropy for 300 simulated samples for filtered distribution:")
+entropy_filtered_300
+print("Entropy for 100 simulated samples for smoothed distribution:")
+entropy_smoothed_100
+print("Entropy for 300 simulated samples for smoothed distribution:")
+entropy_smoothed_300
 
-The entropy for the case with 300 simluated cases is:
+```
 
 ```{r task_6_3, echo=FALSE}
-entropy_300
+
+
+print("Accuracy for 100 simulated samples for filtered distribution:")
+accuracy_function(filtered_prediction,simulated_steps$states)
+print("Accuracy for 300 simulated samples for filtered distribution:")
+accuracy_function(filtered_prediction_300,simulated_steps_300$states)
+print("Accuracy for 100 simulated samples for smoothed distribution:")
+accuracy_function(smoothed_prediction,simulated_steps$states)
+print("Accuracy for 300 simulated samples for smoothed distribution:")
+accuracy_function(smoothed_prediction_300,simulated_steps_300$states)
 ```
+
+As one can see above in the entropy and the accuracy there is no correlation between more samples and better accuracy of where the robot is. 
 
 ## Task 7
 

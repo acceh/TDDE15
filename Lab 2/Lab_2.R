@@ -116,19 +116,15 @@ accuracy_function(viterbi, simulated_steps$states)
 ##### TASK 5 #####
 #Different seed
 set.seed(67890)
-simulated_steps_seeded <- simHMM(hmm,100)
+simulated_steps_seeded <- simHMM(hmm, 100)
 
 hmm_forward_alpha_seeded <-
-  exp(forward(
-    hmm = hmm,
-    observation = simulated_steps_seeded$observation
-  ))
+  exp(forward(hmm = hmm,
+              observation = simulated_steps_seeded$observation))
 
 hmm_backward_beta_seeded <-
-  exp( backward(
-    hmm = hmm,
-    observation = simulated_steps_seeded$observation
-  ))
+  exp(backward(hmm = hmm,
+               observation = simulated_steps_seeded$observation))
 
 filtered_seeded <- filter_function(hmm_forward_alpha_seeded)
 
@@ -137,8 +133,10 @@ smoothed_seeded <-
 
 viterbi_seeded <- viterbi(hmm, simulated_steps$observation)
 
-filtered_prediction_seeded <- apply(t(filtered_seeded), MARGIN = 1, which.max)
-smoothed_prediction_seeded <- apply(t(smoothed_seeded), MARGIN = 1, which.max)
+filtered_prediction_seeded <-
+  apply(t(filtered_seeded), MARGIN = 1, which.max)
+smoothed_prediction_seeded <-
+  apply(t(smoothed_seeded), MARGIN = 1, which.max)
 
 
 accuracy_function(filtered_prediction_seeded, simulated_steps_seeded$states)
@@ -160,25 +158,53 @@ hmm_backward_beta_300 <-
   exp(backward(hmm = hmm,
                observation = simulated_steps_300$observation))
 
-filtered_300 <- filter_function(hmm_forward_alpha)
+filtered_300 <- filter_function(hmm_forward_alpha_300)
 
 smoothed_300 <-
-  smooth_function(hmm_forward_alpha, hmm_backward_beta)
+  smooth_function(hmm_forward_alpha_300, hmm_backward_beta_300)
 
 viterbi_300 <- viterbi(hmm, simulated_steps_300$observation)
 
-filtered_prediction_300 <- apply(t(filtered), MARGIN = 1, which.max)
+smoothed_prediction_300 <-
+  apply(t(smoothed_300), MARGIN = 1, which.max)
+filtered_prediction_300 <-
+  apply(t(filtered_300), MARGIN = 1, which.max)
 
-entropy_100 <- entropy.empirical(filtered_prediction)
-entropy_300 <- entropy.empirical(filtered_prediction_300)
+entropy_filtered_100 <- entropy.empirical(filtered_prediction)
+entropy_filtered_300 <- entropy.empirical(filtered_prediction_300)
+entropy_smoothed_100 <- entropy.empirical(smoothed_prediction)
+entropy_smoothed_300 <- entropy.empirical(smoothed_prediction_300)
 
-entropy_100
-entropy_300
+
+
+
+
+print("Entropy for 100 simulated samples for filtered distribution:")
+entropy_filtered_100
+print("Entropy for 300 simulated samples for filtered distribution:")
+entropy_filtered_300
+print("Entropy for 100 simulated samples for smoothed distribution:")
+entropy_smoothed_100
+print("Entropy for 300 simulated samples for smoothed distribution:")
+entropy_smoothed_300
+
+
+
+
+print("Accuracy for 100 simulated samples for filtered distribution:")
+accuracy_function(filtered_prediction, simulated_steps$states)
+print("Accuracy for 300 simulated samples for filtered distribution:")
+accuracy_function(filtered_prediction_300, simulated_steps_300$states)
+print("Accuracy for 100 simulated samples for smoothed distribution:")
+accuracy_function(smoothed_prediction, simulated_steps$states)
+print("Accuracy for 300 simulated samples for smoothed distribution:")
+accuracy_function(smoothed_prediction_300, simulated_steps_300$states)
+
 
 
 ##### TASK 7 #####
 
-step_101 <- transition_probs %*% t(filtered)[100, ]
+step_101 <- transition_probs %*% t(filtered)[100,]
 
 print(step_101)
 
