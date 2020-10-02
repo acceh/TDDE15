@@ -77,6 +77,18 @@ GreedyPolicy <- function(x, y){
   
   # Your code here.
   
+  arr <- c(rep(0,4))
+  
+  for (i in 1:4) {
+  arr[i]<-  q_table[,,i][x,y]
+  }
+  print(arr)
+  
+  print(which.max(arr))
+  
+
+  
+  
 }
 
 EpsilonGreedyPolicy <- function(x, y, epsilon){
@@ -144,6 +156,7 @@ q_learning <- function(start_state, epsilon = 0.5, alpha = 0.1, gamma = 0.95,
     # Follow policy, execute action, get reward.
     
     # Q-table update.
+    q_table[,,action][x,y] <<-   q_table[,,action][x,y]*(1-alpha) + alpha*(reward_map[x,y]+gamma*max(q_table))
     
     if(reward!=0)
       # End episode.
@@ -252,3 +265,4 @@ for(j in c(0,0.2,0.4,0.66)){
   
   vis_environment(i, gamma = 0.6, beta = j)
 }
+
