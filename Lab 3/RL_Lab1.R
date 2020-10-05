@@ -2,6 +2,8 @@
 # For teaching purposes.
 # jose.m.pena@liu.se.
 
+### MODIFIED BY AXEL HOLMBERG (axeho681@student.liu.se) AT "YOUR CODE HERE" ###
+
 #####################################################################################################
 # Q-learning
 #####################################################################################################
@@ -76,14 +78,10 @@ GreedyPolicy <- function(x, y) {
   
   # Your code here.
   
-  arr <- c(rep(0, 4))
-  
-  for (i in 1:4) {
-    arr[i] <-  q_table[, , i][x, y]
-  }
+  max <-which(q_table[x,y,] == max(q_table[x,y,]))
+  index <- sample(1:length(max),1)
 
-  
-  return(which.max(arr))
+  return(max[index])
 }
 
 EpsilonGreedyPolicy <- function(x, y, epsilon){
@@ -98,6 +96,13 @@ EpsilonGreedyPolicy <- function(x, y, epsilon){
   #   An action, i.e. integer in {1,2,3,4}.
   
   # Your code here.
+  
+
+  if(runif(1,0,1)<epsilon) return(sample(1:4,1))
+  
+  action <- GreedyPolicy(x,y)
+
+  return(action)
   
 }
 
@@ -123,59 +128,71 @@ transition_model <- function(x, y, action, beta){
   return (foo)
 }
 
-q_learning <- function(start_state, epsilon = 0.5, alpha = 0.1, gamma = 0.95, 
-                       beta = 0){
-  
-  # Perform one episode of Q-learning. The agent should move around in the 
-  # environment using the given transition model and update the Q-table.
-  # The episode ends when the agent reaches a terminal state.
-  # 
-  # Args:
-  #   start_state: array with two entries, describing the starting position of the agent.
-  #   epsilon (optional): probability of acting greedily.
-  #   alpha (optional): learning rate.
-  #   gamma (optional): discount factor.
-  #   beta (optional): slipping factor.
-  #   reward_map (global variable): a HxW array containing the reward given at each state.
-  #   q_table (global variable): a HxWx4 array containing Q-values for each state-action pair.
-  # 
-  # Returns:
-  #   reward: reward received in the episode.
-  #   correction: sum of the temporal difference correction terms over the episode.
-  #   q_table (global variable): Recall that R passes arguments by value. So, q_table being
-  #   a global variable can be modified with the superassigment operator <<-.
-  
-  # Your code here
-  
-  
-  state <- start_state
-  
 
-  
-  repeat {
-    # Follow policy, execute action, get reward.
-    print("asd")
-    x <- state[1]
-    y <- state[2]
-    print(GreedyPolicy(x, y))
+q_learning <-
+  function(start_state,
+           epsilon = 0.5,
+           alpha = 0.1,
+           gamma = 0.95,
+           beta = 0) {
+    # Perform one episode of Q-learning. The agent should move around in the
+    # environment using the given transition model and update the Q-table.
+    # The episode ends when the agent reaches a terminal state.
+    #
+    # Args:
+    #   start_state: array with two entries, describing the starting position of the agent.
+    #   epsilon (optional): probability of acting greedily.
+    #   alpha (optional): learning rate.
+    #   gamma (optional): discount factor.
+    #   beta (optional): slipping factor.
+    #   reward_map (global variable): a HxW array containing the reward given at each state.
+    #   q_table (global variable): a HxWx4 array containing Q-values for each state-action pair.
+    #
+    # Returns:
+    #   reward: reward received in the episode.
+    #   correction: sum of the temporal difference correction terms over the episode.
+    #   q_table (global variable): Recall that R passes arguments by value. So, q_table being
+    #   a global variable can be modified with the superassigment operator <<-.
     
-    action <- GreedyPolicy(x, y)
+    # Your code here
     
-    state <- transition_model(x, y, action, beta)
     
-
-    # Q-table update.
-    q_table[, , action][x, y] <<-
-      q_table[, , action][x, y] * (1 - alpha) + alpha * (reward_map[x, y] +
-                                                           gamma * max(q_table))
-    reward <- reward_map[x][y]
+    state <- start_state
+    #no_of_episodes <- 1
     
-    if (reward != 0)
-      # End episode.
-      return (c(reward, episode_correction))
+    repeat {
+      # Follow policy, execute action, get reward.
+      x <- state[1]
+      y <- state[2]
+      
+     # action <- GreedyPolicy(x, y)
+      action <- EpsilonGreedyPolicy(x, y,epsilon)
+      
+      new_state <- transition_model(x, y, action, beta)
+      
+      # Q-table update.
+      reward <- reward_map[x, y]
+      
+      
+      episode_correction <-
+        reward + gamma * max(q_table[new_state[1], new_state[2] , ]) - q_table[x, y , action]
+      
+      q_table[x, y, action] <<-
+        q_table[x, y, action] + alpha * (episode_correction)
+      
+      
+      state <- new_state
+  #    no_of_episodes <- no_of_episodes + 1
+      
+      
+      
+      if (reward != 0)
+        # End episode.
+        return (c(reward, episode_correction))
+     
+    }
+    
   }
-  
-}
 
 #####################################################################################################
 # Q-Learning Environments
@@ -195,6 +212,7 @@ q_table <- array(0,dim = c(H,W,4))
 vis_environment()
 
 for(i in 1:10000){
+  print(i)
   foo <- q_learning(start_state = c(3,1))
   
   if(any(i==c(10,100,1000,10000)))
@@ -225,6 +243,7 @@ MovingAverage <- function(x, n){
 }
 
 for(j in c(0.5,0.75,0.95)){
+  #Comparing gamma
   q_table <- array(0,dim = c(H,W,4))
   reward <- NULL
   correction <- NULL
@@ -236,11 +255,12 @@ for(j in c(0.5,0.75,0.95)){
   }
   
   vis_environment(i, gamma = j)
-  plot(MovingAverage(reward,100),type = "l")
-  plot(MovingAverage(correction,100),type = "l")
+  plot(MovingAverage(reward,100),type = "l", main=paste("Reward, Episolon ", 0.5, " Gamma ", j))
+  plot(MovingAverage(correction,100),type = "l", main=paste("Correction, Episolon ", 0.5, " Gamma ", j))
 }
 
 for(j in c(0.5,0.75,0.95)){
+  #Comparing 
   q_table <- array(0,dim = c(H,W,4))
   reward <- NULL
   correction <- NULL
@@ -252,8 +272,8 @@ for(j in c(0.5,0.75,0.95)){
   }
   
   vis_environment(i, epsilon = 0.1, gamma = j)
-  plot(MovingAverage(reward,100),type = "l")
-  plot(MovingAverage(correction,100),type = "l")
+  plot(MovingAverage(reward,100),type = "l",main=paste("Reward, Episolon ", 0.1, " Gamma ", j))
+  plot(MovingAverage(correction,100),type = "l",main=paste("Correction, Episolon ", 0.1, " Gamma ", j))
 }
 
 # Environment C (the effect of beta).
@@ -277,4 +297,4 @@ for(j in c(0,0.2,0.4,0.66)){
   
   vis_environment(i, gamma = 0.6, beta = j)
 }
-
+ 

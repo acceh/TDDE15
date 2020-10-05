@@ -1,0 +1,79 @@
+---
+title: "Lab 3"
+author: "Axel Holmberg (axeho681)"
+date: "10/4/2020"
+output: pdf_document
+---
+
+```{r Set up, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+## Task 2.2
+
+Below are the environments after 10, 100 and 1000 and 10000 runs done with the Greedy Policy. Questions and answers under images.
+
+- *What has the agent learned after the first 10 episodes?*
+
+![10 iterations](10_iterations.png)
+
+As one can see in the image above the agent has not learned much in the first 10 iterations. The only q-value thas has been updated is after having gotten a negative reward in $x=3,y=2$.
+
+- *Is the final greedy policy (after 10000 episodes) optimal? Why / Why not ?*
+
+![10 000 iterations](10000_iterations.png)
+
+The image above shows the path after $10 000$ iterations. The agent takes one of the most optimal paths as it takes the least amount of steps possible to get to the reward. Alhough there are many possible solutions for this where the agent takes exactly 9 steps.
+
+- *Does the agent learn that there are multiple paths to get to the positive reward ? If not, what could be done to make the agent learn this ?*
+
+No, the agent only learns one path. The reason for this is that there is no incentive for it to look for other paths other than the one that it has gotten some reward for as it doesn't have any randomness in the policy for its' movement.
+
+## Task 2.3
+
+
+As $\gamma$ denounces the discount factor that means that it adjusts how much of the values of the Q-table should affect the new updated Q-value, called correction. One can see this quite clearly if one compares $\gamma=0.75$ with $\gamma=0.95$.
+
+![$\gamma=0.75, \epsilon=0.5$](gamma_0_7_5.png)
+
+![$\gamma=0.95, \epsilon=0.5$](gamma_0_9_5.png)
+
+The big difference one can see in the images above is how all the q-values are a lot higher when $\gamma=0.95$.
+
+One more thing that is clearly visible in these images is the effect of $\epsilon$. $\epsilon$ is the threshold for exploration. As $\epsilon=0.5$ in both of the above that means than in each evaluation of the $\epsilon$-greedy policy there is a $50 \%$ chance that it instead takes a random step. That means that it has a high chance of exploring more of the tiles. If one compares this with where $\epsilon=0.1$ like the images below the results is quite clear.
+
+![$\gamma=0.75, \epsilon=0.1$](gamma_0_7_5_epsilon_0_1.png)
+
+![$\gamma=0.95, \epsilon=0.1$](gamma_0_9_5_epsilon_0_1.png)
+
+As one can see it almost never takes a step beyond the tile with a reward of 5 as the low exploration rate makes it go straight to the tile with a reward of 5. This can also be seen in the graph below showing the rolling mean of the rewards where it aslmost always 5. 
+
+![$\gamma=0.75, \epsilon=0.1$](reward_gamma_0_7_5_epsilon_0_1.png)
+
+![$\gamma=0.95, \epsilon=0.1$](reward_gamma_0_9_5_epsilon_0_1.png)
+
+One can also look at the correction graph. The correction graph (see below) shows the correction of each step. This shows how much of a correction that occurs with each step. 
+
+![$\gamma=0.95, \epsilon=0.1$](correction_gamma_0_9_5_epsilon_0_1.png)
+
+![$\gamma=0.95, \epsilon=0.5$](correction_gamma_0_9_5_epsilon_0_5.png)
+
+The difference between these two are quite significant. The higher value of $\epsilon$ leads to more variation and mainly a higher correction overall. What this means is that with each episode the correction of the q values are higher. The reason for is that the higher the probability of acting greedily is the more different paths and more will be discorvered and the more correction is done each step and episode.
+
+There are more to be analysed from the data and the graphs, but above is the key takeaways that I did of the graphs.
+
+## Task 2.4
+
+$\beta$ is the slipping factor. The slipping factor can make the action "slip" and make the action be something different. The $\beta$ is the probability of the agent slipping to the side when trying to move with each step.
+
+
+![$\beta=0$](beta_0.png)
+![$\beta=0_2$](beta_0_2.png)
+![$\beta=0_4$](beta_0_4.png)
+![$\beta=0_66$](beta_0_6.png)
+
+
