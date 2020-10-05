@@ -68,12 +68,19 @@ There are more to be analysed from the data and the graphs, but above is the key
 
 ## Task 2.4
 
-$\beta$ is the slipping factor. The slipping factor can make the action "slip" and make the action be something different. The $\beta$ is the probability of the agent slipping to the side when trying to move with each step.
+$\beta$ is the slipping factor. The slipping factor can make the action "slip" and make the action be something different. The $\beta$ is the probability of the agent slipping to the side when trying to move with each step. The steps taken for each beta can be seen in the figures below.
 
+![$\beta=0$](beta_0.png) 
 
-![$\beta=0$](beta_0.png)
 ![$\beta=0_2$](beta_0_2.png)
+
 ![$\beta=0_4$](beta_0_4.png)
+
 ![$\beta=0_66$](beta_0_6.png)
+
+As one can see the higher $\beta$ the lower the q-values of the tiles close to the reward are and the higher the values not close to the reward is. The reason is that the slipping makes makes it end up in tiles that it was not supposed to, which leads to that it takes other paths and thereby explores more tiles than when it is not slipping.
+
+
+## Task 2.5
 
 
