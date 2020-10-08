@@ -290,7 +290,7 @@ As one can see above in the entropy and the accuracy there is no correlation bet
 *Consider any of the samples above of length 100. Compute the probabilities of the hidden states for the time step 101.*
 
 ```{r task_7, echo=FALSE}
-step_101 <- transition_probs %*% t(filtered)[100, ]
+step_101 <-  t(filtered)[100, ] %*% transition_probs
 ```
 
 The 101st step would be:

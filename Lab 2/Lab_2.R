@@ -204,7 +204,7 @@ accuracy_function(smoothed_prediction_300, simulated_steps_300$states)
 
 ##### TASK 7 #####
 
-step_101 <- transition_probs %*% t(filtered)[100,]
+step_101 <-  t(filtered)[100, ] %*% transition_probs
 
 print(step_101)
 

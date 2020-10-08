@@ -158,8 +158,7 @@ q_learning <-
     
     
     state <- start_state
-    #no_of_episodes <- 1
-    
+    episode_correction <- 0
     repeat {
       # Follow policy, execute action, get reward.
       x <- state[1]
@@ -171,19 +170,19 @@ q_learning <-
       new_state <- transition_model(x, y, action, beta)
       
       # Q-table update.
-      reward <- reward_map[x, y]
+      reward <- reward_map[new_state[1], new_state[2]]
+      
+      tmp_episode_correction <- reward + gamma * max(q_table[new_state[1], new_state[2] , ]) - q_table[x, y , action]
+
+      episode_correction <- episode_correction + tmp_episode_correction
       
       
-      episode_correction <-
-        reward + gamma * max(q_table[new_state[1], new_state[2] , ]) - q_table[x, y , action]
       
       q_table[x, y, action] <<-
-        q_table[x, y, action] + alpha * (episode_correction)
+        q_table[x, y, action] + alpha * (tmp_episode_correction)
       
       
       state <- new_state
-  #    no_of_episodes <- no_of_episodes + 1
-      
       
       
       if (reward != 0)
@@ -211,7 +210,7 @@ q_table <- array(0,dim = c(H,W,4))
 
 vis_environment()
 
-for(i in 1:10000){
+for(i in 1:10000){A
   print(i)
   foo <- q_learning(start_state = c(3,1))
   

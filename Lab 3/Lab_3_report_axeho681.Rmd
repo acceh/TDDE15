@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-## Task 2.2
+## Environment A
 
 Below are the environments after 10, 100 and 1000 and 10000 runs done with the Greedy Policy. Questions and answers under images.
 
@@ -21,20 +21,19 @@ Below are the environments after 10, 100 and 1000 and 10000 runs done with the G
 
 ![10 iterations](10_iterations.png)
 
-As one can see in the image above the agent has not learned much in the first 10 iterations. The only q-value thas has been updated is after having gotten a negative reward in $x=3,y=2$.
+As one can see in the image above the agent has not learned much in the first 10 iterations. The only q-value that has been updated is after having gotten a negative reward in $x=3,y=2$.
 
 - *Is the final greedy policy (after 10000 episodes) optimal? Why / Why not ?*
 
 ![10 000 iterations](10000_iterations.png)
 
-The image above shows the path after $10 000$ iterations. The agent takes one of the most optimal paths as it takes the least amount of steps possible to get to the reward. Alhough there are many possible solutions for this where the agent takes exactly 9 steps.
+The image above shows the path after $10 000$ iterations. The policy is almost optimal apart from mainly the area around $(4,2)$ where the arrows should be up instead and in $(1,3)$.
 
 - *Does the agent learn that there are multiple paths to get to the positive reward ? If not, what could be done to make the agent learn this ?*
 
-No, the agent only learns one path. The reason for this is that there is no incentive for it to look for other paths other than the one that it has gotten some reward for as it doesn't have any randomness in the policy for its' movement.
+Yes, but the agent. Although it it mainly taking the path below the negative reward, which decreases the amount of possible paths it can take.
 
-## Task 2.3
-
+## Environment B
 
 As $\gamma$ denounces the discount factor that means that it adjusts how much of the values of the Q-table should affect the new updated Q-value, called correction. One can see this quite clearly if one compares $\gamma=0.75$ with $\gamma=0.95$.
 
@@ -66,9 +65,9 @@ The difference between these two are quite significant. The higher value of $\ep
 
 There are more to be analysed from the data and the graphs, but above is the key takeaways that I did of the graphs.
 
-## Task 2.4
+## Environment C
 
-$\beta$ is the slipping factor. The slipping factor can make the action "slip" and make the action be something different. The $\beta$ is the probability of the agent slipping to the side when trying to move with each step. The steps taken for each beta can be seen in the figures below.
+$\beta$ is the slipping factor. The slipping factor can make the action "slip" and make the action be something different. The $\beta$ is the probability of the agent slipping to the side when trying to move with each step. So as one can see in the examples below - the higher the $\beta$ the higher is the probability that the agent takes the path where $x=3$ as there is a smaller chance of it slipping in to the negative reward.
 
 ![$\beta=0$](beta_0.png) 
 
@@ -78,9 +77,38 @@ $\beta$ is the slipping factor. The slipping factor can make the action "slip" a
 
 ![$\beta=0_66$](beta_0_6.png)
 
-As one can see the higher $\beta$ the lower the q-values of the tiles close to the reward are and the higher the values not close to the reward is. The reason is that the slipping makes makes it end up in tiles that it was not supposed to, which leads to that it takes other paths and thereby explores more tiles than when it is not slipping.
+## Environment D
+
+- *Has the agent learned a good policy? Why / Why not?*
+
+Yes, the agent has learned a good policy as in almost all of the cases the agent would end up at the goal no matter what the starting position would be.
+
+Example:
+
+![Reinforce with goal in $(1,4)$](reinforce_1.png)
+
+Example with one bad probability in $(1,4)$:
+
+![Reinforce with goal in $(2,4)$](reinforce_2.png)
+
+- *Could you have used the Q-learning algorithm to solve this task?*
+
+No, it would not work as the goals move, which Q-learning would not be able to handle.
 
 
-## Task 2.5
+## Environment E
+
+- *Has the agent learned a good policy? Why / Why not?*
+
+The policy is worse than in Environment D as there are a lot more cases where if the agent where placed in a random tile in the grid they would not end up at the goal. The reason for this is that it learns to just move generally from the top row to to the goal, which does not work as the goal can be in any of the bottom tiles.
+
+Example of a bad policy where the agent would end up almost stuck at the right edge most of the time: 
+
+![Reinforce with goal in $(1,1)$](rle_3_5000.png)
+
+
+- *If the results obtained for environments D and E differ, explain why.*
+
+The results differ for the reason stated in the question above.
 
 
