@@ -138,7 +138,7 @@ sq_exp <- function(x, xStar, sigmaF, l) {
   return(k)
 }
 
-posterior_GP <- function(x, y, xStar, sigmaNoise, sigmaF, k) {
+posterior_GP <- function(x, y, xStar, sigmaNoise, sigmaF, l) {
   n <- length(x)
   
   #Covariance matrices
@@ -150,13 +150,13 @@ posterior_GP <- function(x, y, xStar, sigmaNoise, sigmaF, k) {
   )
   K_X_XStar <- sq_exp(
     x = x,
-    x_star = xStar,
+    xStar = xStar,
     sigmaF = sigmaF,
     l = l
   )
   K_XStar_XStar <- sq_exp(
     x = xStar,
-    x_star = xStar,
+    xStar = xStar,
     sigmaF = sigmaF,
     l = l
   )
@@ -180,26 +180,111 @@ posterior_GP <- function(x, y, xStar, sigmaNoise, sigmaF, k) {
   
   post_var_f <- diag(post_cov_matrix_f)
   
-  return (c(mean = posterior_mean_f, variance = post_var_f))
+  return (data.frame(mean = posterior_mean_f, variance = post_var_f))
 }
 
 plot_GP <- function(mean, grid, var, obs) {
   
+  confI <- data.frame(upper = mean + 1.96*sqrt(var), lower = mean - 1.96*sqrt(var))
+  ylim <- c(min(confI$lower) - 1,
+            max(confI$upper) + 1)
+  
+  plot(x=grid, y=mean, type="l",ylim=ylim)
+  
+  lines(x=grid, y=confI$upper, col="red")
+  lines(x=grid, y=confI$lower, col="red")
+  
+  
+  
+  points(obs$x, obs$y, col="green")
+  
   
 }
+
 
 ### TASK 2.1.1 ###
 
 # See code above
 
-
 ### TASK 2.1.2 ###
 
 sigmaF <- 1
+sigmaNoise <- 0.1
 
 l <- 0.3
 
-x <- 0.4
-y <- 0.719
+obs <- data.frame(x=c(0.4), y=c(0.719))
 
 xGrid <- seq(-1, 1, 0.01)
+
+postF <-
+  posterior_GP(
+    x = obs$x,
+    y = obs$y,
+    xStar = xGrid,
+    sigmaF = sigmaF,
+    sigmaNoise = sigmaNoise,
+    l = l
+  )
+
+plot_GP(postF$mean, xGrid,postF$variance,obs)
+
+
+
+
+### TASK 2.1.3 ###
+
+
+obs <- data.frame(x=c(0.4,-0.6), y=c(0.719,-0.044))
+
+postF <-
+  posterior_GP(
+    x = obs$x,
+    y = obs$y,
+    xStar = xGrid,
+    sigmaF = sigmaF,
+    sigmaNoise = sigmaNoise,
+    l = l
+  )
+
+plot_GP(postF$mean, xGrid,postF$variance,obs)
+
+
+### TASK 2.1.4 ###
+
+
+obs <- data.frame(x=c(-1,-0.6,-0.2,0.4,0.8), y=c(0.768,-0.044, -0.940,0.719,-0.664))
+
+postF <-
+  posterior_GP(
+    x = obs$x,
+    y = obs$y,
+    xStar = xGrid,
+    sigmaF = sigmaF,
+    sigmaNoise = sigmaNoise,
+    l = l
+  )
+
+plot_GP(postF$mean, xGrid,postF$variance,obs)
+
+
+
+### TASK 2.1.5 ###
+
+sigmaF <- 1
+l <- 1
+
+postF <-
+  posterior_GP(
+    x = obs$x,
+    y = obs$y,
+    xStar = xGrid,
+    sigmaF = sigmaF,
+    sigmaNoise = sigmaNoise,
+    l = l
+  )
+
+plot_GP(postF$mean, xGrid,postF$variance,obs)
+
+
+# The result of changing l and sigma f is that it becomes a lot smoother. The accuracy is a lot worse though as all the observations are outside of the confidence intervals.
