@@ -111,4 +111,14 @@ Example of a bad policy where the agent would end up almost stuck at the right e
 
 The results differ for the reason stated in the question above.
 
+\newpage
 
+## Appendix for code
+
+```{r, code=readLines("RL_Lab1.R"), echo=TRUE, eval=FALSE}
+
+```
+
+```{r, code=readLines("RL_Lab2.R"), echo=TRUE, eval=FALSE}
+
+```
