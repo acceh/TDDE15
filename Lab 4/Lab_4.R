@@ -1,5 +1,6 @@
 
 
+
 ##### GIVEN CODE #####
 #install.packages("mvtnorm")
 library("mvtnorm")
@@ -47,10 +48,10 @@ fSim <-
         nSim,
         sigmaF,
         l)
-plot(xGrid, fSim[1, ], type = "p", ylim = c(-3, 3))
+plot(xGrid, fSim[1,], type = "p", ylim = c(-3, 3))
 if (nSim > 1) {
   for (i in 2:nSim) {
-    lines(xGrid, fSim[i, ], type = "p")
+    lines(xGrid, fSim[i,], type = "p")
   }
 }
 lines(xGrid, MeanFunc(xGrid), col = "red", lwd = 3)
@@ -80,7 +81,7 @@ plotGPPrior <- function(sigmaF, l, nSim) {
           l)
   plot(
     xGrid,
-    fSim[1, ],
+    fSim[1,],
     type = "l",
     ylim = c(-3, 3),
     ylab = "f(x)",
@@ -88,7 +89,7 @@ plotGPPrior <- function(sigmaF, l, nSim) {
   )
   if (nSim > 1) {
     for (i in 2:nSim) {
-      lines(xGrid, fSim[i, ], type = "l")
+      lines(xGrid, fSim[i,], type = "l")
     }
   }
   lines(xGrid, MeanFunc(xGrid), col = "red", lwd = 3)
@@ -127,8 +128,78 @@ manipulate(
 
 ##### END GIVEN CODE #####
 
+sq_exp <- function(x, xStar, sigmaF, l) {
+  n1 <- length(x)
+  n2 <- length(xStar)
+  k <- matrix(NA, n1, n2)
+  for (i in 1:n2) {
+    k[, i] <- sigmaF ^ 2 * exp(-0.5 * ((x - xStar[i]) / l) ^ 2)
+  }
+  return(k)
+}
 
+posterior_GP <- function(x, y, xStar, sigmaNoise, sigmaF, k) {
+  n <- length(x)
+  
+  #Covariance matrices
+  K_X_X <- sq_exp(
+    x = x,
+    xStar = x,
+    sigmaF = sigmaF,
+    l = l
+  )
+  K_X_XStar <- sq_exp(
+    x = x,
+    x_star = xStar,
+    sigmaF = sigmaF,
+    l = l
+  )
+  K_XStar_XStar <- sq_exp(
+    x = xStar,
+    x_star = xStar,
+    sigmaF = sigmaF,
+    l = l
+  )
+  
+  
+  L <- t(chol(K_X_X + sigmaNoise ^ 2 * diag(n)))
+  
+  
+  alphaB <- solve(a = L,
+                  b = y)
+  alpha <- solve(a = t(L),
+                 b = alphaB)
+  
+  # Compute posterior mean of f
+  posterior_mean_f <- t(K_X_XStar) %*% alpha
+  
+  v <- solve(a = L,
+             b = K_X_XStar)
+  
+  post_cov_matrix_f <- K_XStar_XStar - t(v) %*% v
+  
+  post_var_f <- diag(post_cov_matrix_f)
+  
+  return (c(mean = posterior_mean_f, variance = post_var_f))
+}
 
-posterior_GP <- function() {
+plot_GP <- function(mean, grid, var, obs) {
+  
   
 }
+
+### TASK 2.1.1 ###
+
+# See code above
+
+
+### TASK 2.1.2 ###
+
+sigmaF <- 1
+
+l <- 0.3
+
+x <- 0.4
+y <- 0.719
+
+xGrid <- seq(-1, 1, 0.01)
